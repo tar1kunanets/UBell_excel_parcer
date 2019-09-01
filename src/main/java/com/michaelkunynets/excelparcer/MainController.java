@@ -1,17 +1,20 @@
 package com.michaelkunynets.excelparcer;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
-import java.awt.*;
+import javax.swing.*;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+import java.lang.String;
 
 public class MainController {
     private static Logger LOGGER = null;
@@ -25,7 +28,8 @@ public class MainController {
     private ReadXls readXls;
 
     @FXML
-    private TableView work_table;
+    public TableView work_table;
+
 
     @FXML
     private void SendMouseClicked(ActionEvent event) {
@@ -41,6 +45,9 @@ public class MainController {
         if (selectedFile != null || selectedFile.getName().endsWith(".xlsx")) {
             LOGGER.info("File choose correctly");
             readXls = new ReadXls(selectedFile.getPath());
+            work_table.setTableMenuButtonVisible(true);
+            SetTableViewRooms(readXls.getClassName(), readXls.Read());
+            work_table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         } else {
             LOGGER.warning("File choose incorrect, send alert");
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -60,7 +67,42 @@ public class MainController {
         Platform.exit();
     }
 
-    public void SetTableViewRooms() {
-//        work_table.getColumns().addAll();
+    private void SetTableViewRooms(String[] rooms, String[][] inputData) {
+        LOGGER.info("try set Class name");
+        work_table.setEditable(true);
+//        for (int i = 0; i < rooms.length; ++i) {
+//            TableColumn column = new TableColumn(rooms[i]);
+//            work_table.getColumns().add(column);
+//        }
+        for (int i = 0; i < rooms.length; i++) {
+
+            TableColumn<List<String>, String> column = new TableColumn<>(rooms[i]);
+
+            final int colIndex = i;
+            column.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(cellData.getValue().get(colIndex)));
+
+            work_table.getColumns().add(column);
+
+        }
+
+//        work_table.getColumns().addAll(ReadXls.getClassName());
+        List<List<String>> data = new ArrayList<List<String>>();
+
+        for (int i = 0; i < inputData.length; i++) {
+            List<String> row = new ArrayList<String>();
+            for (int j = 0; j < inputData[0].length; j++) {
+
+                row.add(inputData[i][j]);
+            }
+            data.add(row);
+        }
+        ObservableList<List<String>> inpData = FXCollections.observableArrayList(data);
+        work_table.setItems(inpData);
+        work_table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        work_table.refresh();
+//        TablePosition pos = (TablePosition) work_table.getSelectionModel().getSelectedCells().get(0);
+//        int index = pos.getRow();
+        LOGGER.info("all data added to table");
     }
 }

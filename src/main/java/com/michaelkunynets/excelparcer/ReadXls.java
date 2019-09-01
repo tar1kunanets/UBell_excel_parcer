@@ -44,14 +44,16 @@ public class ReadXls {
 
     private String filePath;
 
+    private String[][] TableData = new String[25][83];// Count of subject ( Max 5 ) and count of classes
+    private int RowX = 0, ColY;
+
     public ReadXls(String filePath) {
         this.filePath = filePath;
         LOGGER.info("File path get");
     }
 
-    public void Read() {
+    public String[][] Read() {
         try {
-            //File path
             FileInputStream file = new FileInputStream(new File(filePath));
             XSSFWorkbook workbook = new XSSFWorkbook(file);
             XSSFSheet sheet = workbook.getSheetAt(0);
@@ -68,6 +70,7 @@ public class ReadXls {
                 if (row.getRowNum() == 0)
                     continue;
                 // Open class what will send structured data
+                ColY = 0;
                 Classroom cr = new Classroom();
                 Iterator cells = row.cellIterator();
                 // While cells exists
@@ -109,22 +112,28 @@ public class ReadXls {
                                         cell = sheet.getRow(rowNum).getCell(colIndex);
                                         cr.setEmpty(false);
                                         Sprint(cell.getStringCellValue(), cr);
+
                                         break;
                                     }
                                 }
+
                                 break;
                             }
                             Sprint(cell.getStringCellValue(), cr);
+
                             break;
                     }
+
                 }
+                RowX++;
             }
             file.close();
-            System.out.println("Reading File Done!");
+            LOGGER.info("Reading File Done!");
         } catch (Exception e) {
-            LOGGER.warning("File open incorrectly");
+            LOGGER.warning("File open INCORRECTLY");
             LOGGER.warning("Exception :- " + e.getMessage());
         }
+        return TableData;
     }
 
     // Get index of element ( not only first and last )
@@ -136,7 +145,7 @@ public class ReadXls {
         return pos;
     }
 
-    private static void Sprint(String string, Classroom cr) {
+    private void Sprint(String string, Classroom cr) { // WAS STATIC
         int latin = ordinalIndexOf(string, ".", 1);
         cr.setTeacher(string.substring(0, latin + 1));
         string = string.substring(latin + 2);// Str without teacher
@@ -151,6 +160,7 @@ public class ReadXls {
         }
         cr.setGroup(string.substring(0, latin));
         cr.setSubject(string.substring(latin));
-        cr.SendData();
+        TableData[RowX][ColY] = cr.SendData();
+        ColY++;
     }
 }

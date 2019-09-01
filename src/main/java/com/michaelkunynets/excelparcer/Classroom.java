@@ -50,11 +50,11 @@ public class Classroom {
         this.group = group;
     }
 
-    public void SendData() {
+    public String SendData() {
         if (Empty)
-            System.out.println("Empty");
+            return ("Empty");
         else
-            System.out.println("Дата: " + date + "\n Аудиторія: " + auditorium + "\n Пара: " + subjectNumber + "\n Викладач:"
+            return ("Дата: " + date + "\n Аудиторія: " + auditorium + "\n Пара: " + subjectNumber + "\n Викладач:"
                     + teacher + "\n Групи: " + group + "\n Предмет: " + subject + "\n Тип предмету: " + subjectType);
 
     }
