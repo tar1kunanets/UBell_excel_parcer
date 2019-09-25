@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javafx.collections.ObservableList;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.apache.poi.ss.usermodel.Cell;
@@ -18,6 +19,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.simple.JSONObject;
 
 
 public class ReadXls {
@@ -38,13 +40,12 @@ public class ReadXls {
             "Л 324", "Л 401", "Л 407", "Л 411", "Л 412", "Л 413", "Л 414", "Л 422", "НПРЧ", "С зал1", "С зал2",
             "С зал3", "С зал4", "Спзал1", "Спзал2", "Спзал3", "Спзал4"};
 
-    public static String[] getClassName() {
-        return className;
-    }
 
     private String filePath;
 
-    private String[][] TableData = new String[25][83];// Count of subject ( Max 5 ) and count of classes
+    //    private String[][] TableData = new String[25][83];// Count of subject ( Max 5 ) and count of classes    g[25][83]
+    private Classroom[][] TableData = new Classroom[25][83];// Count of subject ( Max 5 ) and count of classes    g[25][83]
+
     private int RowX = 0, ColY;
 
     public ReadXls(String filePath) {
@@ -52,7 +53,11 @@ public class ReadXls {
         LOGGER.info("File path get");
     }
 
-    public String[][] Read() {
+    protected static String[] getClassName() {
+        return className;
+    }
+
+    protected void Read() {
         try {
             FileInputStream file = new FileInputStream(new File(filePath));
             XSSFWorkbook workbook = new XSSFWorkbook(file);
@@ -71,10 +76,10 @@ public class ReadXls {
                     continue;
                 // Open class what will send structured data
                 ColY = 0;
-                Classroom cr = new Classroom();
                 Iterator cells = row.cellIterator();
                 // While cells exists
                 while (cells.hasNext()) {
+                    Classroom cr = new Classroom();
                     // Get next cell
                     Cell cell = (Cell) cells.next();
                     switch (cell.getColumnIndex()) {
@@ -112,9 +117,12 @@ public class ReadXls {
                                         cell = sheet.getRow(rowNum).getCell(colIndex);
                                         cr.setEmpty(false);
                                         Sprint(cell.getStringCellValue(), cr);
-
                                         break;
                                     }
+                                }
+                                if (cr.isEmpty()) {
+                                    TableData[RowX][ColY] = cr;
+                                    ColY++;
                                 }
 
                                 break;
@@ -133,7 +141,6 @@ public class ReadXls {
             LOGGER.warning("File open INCORRECTLY");
             LOGGER.warning("Exception :- " + e.getMessage());
         }
-        return TableData;
     }
 
     // Get index of element ( not only first and last )
@@ -160,7 +167,27 @@ public class ReadXls {
         }
         cr.setGroup(string.substring(0, latin));
         cr.setSubject(string.substring(latin));
-        TableData[RowX][ColY] = cr.SendData();
+        TableData[RowX][ColY] = cr;
         ColY++;
+    }
+
+    protected String[][] DataForTable() {
+        String[][] tmp = new String[25][83];
+        for (int col = 0; col < 25; ++col) {
+            for (int row = 0; row < 83; ++row) {
+                tmp[col][row] = TableData[col][row].DataToTable();
+            }
+        }
+        return tmp;
+    }
+
+    protected JSONObject[][] DataForServer() {
+        JSONObject[][] tmp = new JSONObject[25][83];
+        for (int col = 0; col < 25; ++col) {
+            for (int row = 0; row < 83; ++row) {
+                tmp[row][col] = TableData[row][col].DataToServer();
+            }
+        }
+        return tmp;
     }
 }

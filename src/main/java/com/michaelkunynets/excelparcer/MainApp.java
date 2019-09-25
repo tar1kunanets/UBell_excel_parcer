@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.awt.*;
 
@@ -24,6 +25,7 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader();
         Parent root = loader.load(getClass().getResourceAsStream("/fxml/main.fxml"));
         stage.setTitle("Excel parser");
+        stage.setResizable(false);
         stage.setScene(new Scene(root));
         stage.show();
     }

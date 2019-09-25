@@ -1,6 +1,10 @@
 package com.michaelkunynets.excelparcer;
 
+import org.json.simple.JSONObject;
+import sun.rmi.runtime.Log;
+
 import java.util.Date;
+import java.util.logging.Logger;
 
 public class Classroom {
     private Date date;
@@ -11,6 +15,10 @@ public class Classroom {
     private String teacher;
     private String group;
     private boolean Empty = false;
+
+    public boolean isEmpty() {
+        return Empty;
+    }
 
     public void setEmpty(boolean empty) {
         Empty = empty;
@@ -50,12 +58,24 @@ public class Classroom {
         this.group = group;
     }
 
-    public String SendData() {
+    public String DataToTable() {
         if (Empty)
             return ("Empty");
         else
             return ("Дата: " + date + "\n Аудиторія: " + auditorium + "\n Пара: " + subjectNumber + "\n Викладач:"
                     + teacher + "\n Групи: " + group + "\n Предмет: " + subject + "\n Тип предмету: " + subjectType);
 
+    }
+
+    public JSONObject DataToServer() {
+        JSONObject object = new JSONObject();
+        object.put("date", date);
+        object.put("auditorium", auditorium);
+        object.put("subjectNum", subjectNumber);
+        object.put("teacher", teacher);
+        object.put("groups", group);
+        object.put("subject", subject);
+        object.put("subjectType", subjectType);
+        return object;
     }
 }

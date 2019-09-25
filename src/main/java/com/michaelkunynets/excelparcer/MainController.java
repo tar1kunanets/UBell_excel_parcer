@@ -8,8 +8,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import javafx.util.Callback;
 
-import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +34,7 @@ public class MainController {
     @FXML
     private void SendMouseClicked(ActionEvent event) {
         // FIXME: 01.09.2019 SEND to Server Here
+//        readXls.DataForServer();
     }
 
     @FXML
@@ -46,8 +47,8 @@ public class MainController {
             LOGGER.info("File choose correctly");
             readXls = new ReadXls(selectedFile.getPath());
             work_table.setTableMenuButtonVisible(true);
-            SetTableViewRooms(readXls.getClassName(), readXls.Read());
-            work_table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+            readXls.Read();
+            SetTableViewRooms(readXls.getClassName(), readXls.DataForTable());
         } else {
             LOGGER.warning("File choose incorrect, send alert");
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -77,7 +78,7 @@ public class MainController {
         for (int i = 0; i < rooms.length; i++) {
 
             TableColumn<List<String>, String> column = new TableColumn<>(rooms[i]);
-
+            column.setSortable(false);
             final int colIndex = i;
             column.setCellValueFactory(cellData ->
                     new SimpleStringProperty(cellData.getValue().get(colIndex)));
@@ -99,7 +100,12 @@ public class MainController {
         }
         ObservableList<List<String>> inpData = FXCollections.observableArrayList(data);
         work_table.setItems(inpData);
-        work_table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        work_table.setColumnResizePolicy(new Callback<TableView.ResizeFeatures, Boolean>() {
+            @Override
+            public Boolean call(TableView.ResizeFeatures p) {
+                return true;
+            }
+        });
         work_table.refresh();
 //        TablePosition pos = (TablePosition) work_table.getSelectionModel().getSelectedCells().get(0);
 //        int index = pos.getRow();
