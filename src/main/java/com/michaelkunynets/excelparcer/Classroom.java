@@ -78,4 +78,32 @@ public class Classroom {
         object.put("subjectType", subjectType);
         return object;
     }
+    
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    QRCodeDTO qrCodeDTO = (QRCodeDTO) o;
+    return Objects.equals(id, qrCodeDTO.id) &&
+        Objects.equals(numberOfLessonInDay, qrCodeDTO.numberOfLessonInDay) &&
+        Objects.equals(subjectName, qrCodeDTO.subjectName) &&
+        Objects.equals(audience, qrCodeDTO.audience) &&
+        Objects.equals(teacherFName, qrCodeDTO.teacherFName) &&
+        Objects.equals(teacherLName, qrCodeDTO.teacherLName) &&
+        Objects.equals(teacherMName, qrCodeDTO.teacherMName) &&
+        Objects.equals(lessonType, qrCodeDTO.lessonType) &&
+        Objects.equals(lessonTypeAbbreviated, qrCodeDTO.lessonTypeAbbreviated) &&
+        Objects.equals(lessonDate, qrCodeDTO.lessonDate) &&
+        Objects.equals(group, qrCodeDTO.group);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, numberOfLessonInDay, subjectName, audience, teacherFName, teacherLName,
+        teacherMName, lessonType, lessonTypeAbbreviated, lessonDate, group);
+  }
 }
